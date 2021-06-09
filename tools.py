@@ -53,17 +53,10 @@ class queryJSON:
         try:
             # CONVERT JSON OBJ. TO DICTIONARY OF SENTENCES SPLIT BY WORD
 
-            # Values Variable Contains List of Sentences Strings
-            # Ex:
-            # ['I ate dinner.', 'We had a three-course meal.', 'Brad...
             rawJSON = self.index(file)
             values = rawJSON.values()
 
             # Populate splitDict with Key/Value Pair of Sentence Index and Sentence
-            # Ex:
-            # splitDict[0] = ['I', 'ate', 'dinner.']
-            # splitDict[1] = ['We', 'had', 'a', 'three-course', 'meal.']
-            # ...
             count = 0
             splitDict = {}
 
@@ -76,18 +69,12 @@ class queryJSON:
             # COUNT OCCURRENCE OF QUERY IN EACH SENTENCE
 
             # Create Dictionary Key/Value Pair for Each Sentence to Count Occurrence of Query
-            # Initialize at 0
             wordCount = {n: 0 for n in splitDict}
 
             # Stem Each Word and Query for Fuzzy Search
-            # Ex: 'Sentences' should come up when searching for 'sentence' and vice versa
             stemmer = PorterStemmer()
 
             # Iterate through Each Word in Each Sentence
-            # Ex:
-            # wordCount[0] = 0 (There are no occurrences of the query at the sentence indexed at 0)
-            # wordCount[1] = 2 (There are 2 occurrences of the query at the sentence indexed at 1)
-            # ...
             for sentence in splitDict:
                 for word in splitDict[sentence]:
 
@@ -103,36 +90,30 @@ class queryJSON:
 
             # RETURN RESULTS DICT. OF SENTENCES AT INDEXES OF QUERY OCCURRENCE IN DESCENDING ORDER
 
-            # Sort Dictionary of Identified Sentences with Query in Descending Order
             sortedDict = dict(
                 sorted(wordCount.items(), key=operator.itemgetter(1), reverse=True))
 
-            # Create Blank List to Store the Indexes of Sentences where Matches are Found
+   
             resultIndexes = []
 
             # Identify Indexes to Return with in Descending Order
-            # Ex: resultIndexes = [15, 16, 17] (Query was found at sentences indexed at 15, 16, 17 respectively in descending order)
             for i in sortedDict:
                 if sortedDict[i] > 0:
                     resultIndexes.append(i)
 
-            # Raise Exception if No Occurrences of Query
             if resultIndexes == []:
                 raise NoResults(query)
 
-            # Create Blank List for Sentence for Matches
             resultList = []
 
             #Format Values Variable
             valueIterator = iter(values)
             value = next(valueIterator)
 
-            # Iterate through Indexes - Append Sentence if Index Matches
             for i in resultIndexes:
                 resultList.append(value[i])
 
             errorMessage = ""
-            # Convert and Format List of Sentences into JSON Object
             resultDict = {
                 "results": resultList,
                 "error": errorMessage
